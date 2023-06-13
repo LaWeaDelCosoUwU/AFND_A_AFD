@@ -8,6 +8,7 @@ import java.util.Set;
 
 
 public class AFND {
+    
     private Set<String> estados;
     private Set<Character> alfabeto;
     private Map<String, Map<Character, Set<String>>> transiciones;
@@ -16,12 +17,14 @@ public class AFND {
     private Set<String> estadosAceptacion;
 
     public AFND() {
+        
         estados = new HashSet<>();
         alfabeto = new HashSet<>();
         transiciones = new HashMap<>();
         transicionesEpsilon = new HashMap<>();
         estadoInicial = "";
         estadosAceptacion = new HashSet<>();
+        
     }
 
     public void agregarEstado(String estado) {
@@ -33,17 +36,21 @@ public class AFND {
     }
 
     public void agregarTransicion(String estadoActual, char simbolo, String estadoDestino) {
+        
         Map<Character, Set<String>> transicionesEstadoActual = transiciones.getOrDefault(estadoActual, new HashMap<>());
         Set<String> transicionesSimbolo = transicionesEstadoActual.getOrDefault(simbolo, new HashSet<>());
         transicionesSimbolo.add(estadoDestino);
         transicionesEstadoActual.put(simbolo, transicionesSimbolo);
         transiciones.put(estadoActual, transicionesEstadoActual);
+        
     }
 
     public void agregarTransicionEpsilon(String estadoActual, String estadoDestino) {
+        
         Set<String> transicionesEpsilonEstadoActual = transicionesEpsilon.getOrDefault(estadoActual, new HashSet<>());
         transicionesEpsilonEstadoActual.add(estadoDestino);
         transicionesEpsilon.put(estadoActual, transicionesEpsilonEstadoActual);
+        
     }
 
     public void setEstadoInicial(String estadoInicial) {
@@ -63,11 +70,14 @@ public class AFND {
     }
 
     public Set<String> getTransiciones(String estadoActual, char simbolo) {
+        
         Map<Character, Set<String>> transicionesEstadoActual = transiciones.get(estadoActual);
+        
         if (transicionesEstadoActual != null) {
             return transicionesEstadoActual.getOrDefault(simbolo, Collections.emptySet());
         }
         return Collections.emptySet();
+        
     }
 
     public Set<String> getTransicionesEpsilon(String estadoActual) {

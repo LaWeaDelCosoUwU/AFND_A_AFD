@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class AFD {
+    
     private Set<String> estados;
     private Set<Character> alfabeto;
     private Map<String, Map<Character, String>> transiciones;
@@ -13,11 +14,13 @@ public class AFD {
     private Set<String> estadosAceptacion;
 
     public AFD() {
+        
         estados = new HashSet<>();
         alfabeto = new HashSet<>();
         transiciones = new HashMap<>();
         estadoInicial = "";
         estadosAceptacion = new HashSet<>();
+        
     }
 
     public void agregarEstado(String estado) {
@@ -33,9 +36,11 @@ public class AFD {
     }
 
     public void agregarTransicion(String estadoActual, char simbolo, String estadoDestino) {
+        
         Map<Character, String> transicionesEstadoActual = transiciones.getOrDefault(estadoActual, new HashMap<>());
         transicionesEstadoActual.put(simbolo, estadoDestino);
         transiciones.put(estadoActual, transicionesEstadoActual);
+        
     }
 
     public void setEstadoInicial(String estadoInicial) {
@@ -55,11 +60,14 @@ public class AFD {
     }
 
     public String getTransicion(String estadoActual, char simbolo) {
+        
         Map<Character, String> transicionesEstadoActual = transiciones.get(estadoActual);
         if (transicionesEstadoActual != null) {
             return transicionesEstadoActual.get(simbolo);
         }
+        
         return null;
+        
     }
 
     public String getEstadoInicial() {
@@ -69,4 +77,5 @@ public class AFD {
     public Set<String> getEstadosAceptacion() {
         return estadosAceptacion;
     }
+    
 }

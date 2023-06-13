@@ -9,20 +9,25 @@ import java.util.Set;
 import java.util.Stack;
 
 public class ProyectoFinalEly {
+    
     public static void main(String[] args) {
+        
         AFND afnd = crearAFNDDesdeEntradaUsuario();
         AFD afd = convertirAFNDaAFD(afnd);
         System.out.println("AFD resultante:");
         imprimirAFD(afd);
+        
     }
 
     private static AFND crearAFNDDesdeEntradaUsuario() {
+        
         AFND afnd = new AFND();
         Scanner scanner = new Scanner(System.in);
 
         // Ingreso de estados
         System.out.println("Ingrese los estados (uno por línea, escriba 'fin' para terminar):");
         String estado;
+        
         while (!(estado = scanner.nextLine()).equalsIgnoreCase("fin")) {
             afnd.agregarEstado(estado);
         }
@@ -31,17 +36,20 @@ public class ProyectoFinalEly {
         System.out.println("Ingrese los símbolos del alfabeto (uno por línea, escriba 'fin' para terminar):");
         String simbolo;
         while (!(simbolo = scanner.nextLine()).equalsIgnoreCase("fin")) {
+            
             if (simbolo.length() == 1) {
                 afnd.agregarSimboloAlfabeto(simbolo.charAt(0));
             } else {
                 System.out.println("Ingrese un único símbolo.");
             }
+            
         }
 
         // Ingreso de transiciones
         System.out.println("Ingrese las transiciones (estadoActual, símbolo, estadoDestino) separadas por comas (una por línea, escriba 'fin' para terminar):");
         String transicion;
         while (!(transicion = scanner.nextLine()).equalsIgnoreCase("fin")) {
+            
             String[] partes = transicion.split(",");
             if (partes.length == 3) {
                 String estadoActual = partes[0].trim();
@@ -51,12 +59,15 @@ public class ProyectoFinalEly {
             } else {
                 System.out.println("Ingrese una transición válida.");
             }
+            
         }
 
         // Ingreso de transiciones épsilon
         System.out.println("Ingrese las transiciones épsilon (estadoActual, estadoDestino) separadas por comas (una por línea, escriba 'fin' para terminar):");
         String transicionEpsilon;
+        
         while (!(transicionEpsilon = scanner.nextLine()).equalsIgnoreCase("fin")) {
+            
             String[] partes = transicionEpsilon.split(",");
             if (partes.length == 2) {
                 String estadoActual = partes[0].trim();
@@ -65,6 +76,7 @@ public class ProyectoFinalEly {
             } else {
                 System.out.println("Ingrese una transición épsilon válida.");
             }
+            
         }
 
         // Ingreso del estado inicial
@@ -75,11 +87,13 @@ public class ProyectoFinalEly {
         // Ingreso de estados de aceptación
         System.out.println("Ingrese los estados de aceptación (uno por línea, escriba 'fin' para terminar):");
         String estadoAceptacion;
+        
         while (!(estadoAceptacion = scanner.nextLine()).equalsIgnoreCase("fin")) {
             afnd.agregarEstadoAceptacion(estadoAceptacion);
         }
 
         return afnd;
+        
     }
 
     private static AFD convertirAFNDaAFD(AFND afnd) {
@@ -89,10 +103,11 @@ public class ProyectoFinalEly {
         Set<String> estadoInicial = cerraduraEpsilon(afnd.getEstadoInicial(), afnd);
         estadosAFD.add(estadoInicial);
         cola.add(estadoInicial);
-
         AFD afd = new AFD();
 
+        //Calcular estados y transiciones nuevas
         while (!cola.isEmpty()) {
+            
             Set<String> estadoActual = cola.poll();
             afd.agregarEstado(convertirConjuntoAString(estadoActual));
 
@@ -104,14 +119,18 @@ public class ProyectoFinalEly {
                 }
                 afd.agregarTransicion(convertirConjuntoAString(estadoActual), simbolo, convertirConjuntoAString(estadoDestino));
             }
+            
         }
         
+        //Añadir alfabeto
         for (char simbolo : afnd.getAlfabeto()) {
             afd.agregarSimboloAlfabeto(simbolo);
         }
-
+        
+        //Añadir estado inicial
         afd.setEstadoInicial(convertirConjuntoAString(cerraduraEpsilon(afnd.getEstadoInicial(), afnd)));
 
+        //Añadir estados de aceptación
         for (Set<String> estadoAFD : estadosAFD) {
             for (String estadoAceptacion : afnd.getEstadosAceptacion()) {
                 if (estadoAFD.contains(estadoAceptacion)) {
@@ -123,52 +142,71 @@ public class ProyectoFinalEly {
         
 
         return afd;
+        
     }
 
     private static Set<String> cerraduraEpsilon(String estado, AFND afnd) {
+        
         Set<String> conjuntoCerradura = new HashSet<>();
         Stack<String> pila = new Stack<>();
         pila.push(estado);
 
         while (!pila.isEmpty()) {
+            
             String estadoActual = pila.pop();
             conjuntoCerradura.add(estadoActual);
             Set<String> estadosDestino = afnd.getTransicionesEpsilon(estadoActual);
+            
             for (String estadoDestino : estadosDestino) {
                 if (!conjuntoCerradura.contains(estadoDestino)) {
                     pila.push(estadoDestino);
                 }
             }
+            
         }
 
         return conjuntoCerradura;
+        
     }
 
     private static Set<String> cerraduraEpsilon(Set<String> estados, AFND afnd) {
+        
         Set<String> conjuntoCerradura = new HashSet<>();
+        
         for (String estado : estados) {
             conjuntoCerradura.addAll(cerraduraEpsilon(estado, afnd));
         }
+        
         return conjuntoCerradura;
+        
     }
 
     private static Set<String> mover(Set<String> estados, char simbolo, AFND afnd) {
+        
         Set<String> conjuntoDestino = new HashSet<>();
+        
         for (String estado : estados) {
             conjuntoDestino.addAll(afnd.getTransiciones(estado, simbolo));
         }
+        
         return conjuntoDestino;
+        
     }
 
     private static String convertirConjuntoAString(Set<String> conjunto) {
+        
         StringBuilder sb = new StringBuilder();
+        
         for (String elemento : conjunto) {
             sb.append(elemento).append(",");
         }
+        
         if (sb.length() > 0) {
             sb.deleteCharAt(sb.length() - 1);
         }
+        
         return sb.toString();
+        
     }
 
     private static void imprimirAFD(AFD afd) {
@@ -187,12 +225,17 @@ public class ProyectoFinalEly {
 
         System.out.println("Transiciones:");
         for (String estadoActual : afd.getTransiciones().keySet()) {
+            
             Map<Character, String> transicionesEstado = afd.getTransiciones().get(estadoActual);
+            
             for (char simbolo : transicionesEstado.keySet()) {
+                
                 String estadoDestino = transicionesEstado.get(simbolo);
                 if(!estadoDestino.isBlank())
                     System.out.println("(" + estadoActual + ", " + simbolo + ") -> " + estadoDestino);
+                
             }
+            
         }
 
         System.out.println("Estado inicial: " + afd.getEstadoInicial());
@@ -201,5 +244,7 @@ public class ProyectoFinalEly {
         for (String estadoAceptacion : afd.getEstadosAceptacion()) {
             System.out.println(estadoAceptacion);
         }
+        
     }
+    
 }
