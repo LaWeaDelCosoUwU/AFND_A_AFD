@@ -12,13 +12,19 @@ public class ProyectoFinalEly {
     
     public static void main(String[] args) {
         
+        // Crear un AFND a partir de la entrada del usuario
         AFND afnd = crearAFNDDesdeEntradaUsuario();
+        
+        // Convertir el AFND a un AFD
         AFD afd = convertirAFNDaAFD(afnd);
+        
+        // Imprimir el AFD resultante
         System.out.println("AFD resultante:");
         imprimirAFD(afd);
         
     }
 
+    // Método para crear un AFND a partir de la entrada del usuario
     private static AFND crearAFNDDesdeEntradaUsuario() {
         
         AFND afnd = new AFND();
@@ -96,41 +102,57 @@ public class ProyectoFinalEly {
         
     }
 
+    // Método para convertir un AFND a un AFD
     private static AFD convertirAFNDaAFD(AFND afnd) {
         
+        // Conjunto de conjuntos de estados del AFD
         Set<Set<String>> estadosAFD = new HashSet<>();
+        
+        // Cola para realizar el procesamiento de los estados del AFD
         Queue<Set<String>> cola = new LinkedList<>();
+        
+        // Cálculo de la cerradura épsilon del estado inicial del AFND
         Set<String> estadoInicial = cerraduraEpsilon(afnd.getEstadoInicial(), afnd);
         estadosAFD.add(estadoInicial);
         cola.add(estadoInicial);
+        
+        // Creación del AFD
         AFD afd = new AFD();
 
-        //Calcular estados y transiciones nuevas
+        // Cálculo de estados y transiciones nuevas del AFD
         while (!cola.isEmpty()) {
             
             Set<String> estadoActual = cola.poll();
+            
+            // Agregar el estado al AFD
             afd.agregarEstado(convertirConjuntoAString(estadoActual));
 
             for (char simbolo : afnd.getAlfabeto()) {
+                
+                // Cálculo de la cerradura épsilon del conjunto de estados destino
                 Set<String> estadoDestino = cerraduraEpsilon(mover(estadoActual, simbolo, afnd), afnd);
+                
+                // Si el conjunto de estados destino no ha sido procesado, se agrega a la cola
                 if (!estadosAFD.contains(estadoDestino)) {
                     estadosAFD.add(estadoDestino);
                     cola.add(estadoDestino);
                 }
+                
+                // Agregar la transición al AFD
                 afd.agregarTransicion(convertirConjuntoAString(estadoActual), simbolo, convertirConjuntoAString(estadoDestino));
             }
             
         }
         
-        //Añadir alfabeto
+        // Añadir el alfabeto al AFD
         for (char simbolo : afnd.getAlfabeto()) {
             afd.agregarSimboloAlfabeto(simbolo);
         }
         
-        //Añadir estado inicial
+        // Añadir el estado inicial al AFD
         afd.setEstadoInicial(convertirConjuntoAString(cerraduraEpsilon(afnd.getEstadoInicial(), afnd)));
 
-        //Añadir estados de aceptación
+        // Añadir los estados de aceptación al AFD
         for (Set<String> estadoAFD : estadosAFD) {
             for (String estadoAceptacion : afnd.getEstadosAceptacion()) {
                 if (estadoAFD.contains(estadoAceptacion)) {
@@ -140,11 +162,11 @@ public class ProyectoFinalEly {
             }
         }
         
-
         return afd;
         
     }
 
+    // Método para calcular la cerradura épsilon de un estado en el AFND
     private static Set<String> cerraduraEpsilon(String estado, AFND afnd) {
         
         Set<String> conjuntoCerradura = new HashSet<>();
@@ -154,9 +176,14 @@ public class ProyectoFinalEly {
         while (!pila.isEmpty()) {
             
             String estadoActual = pila.pop();
+            
+            // Agregar el estado a la cerradura épsilon
             conjuntoCerradura.add(estadoActual);
+            
+            // Obtener los estados destino de las transiciones épsilon
             Set<String> estadosDestino = afnd.getTransicionesEpsilon(estadoActual);
             
+            // Agregar los estados destino a la pila si no han sido visitados
             for (String estadoDestino : estadosDestino) {
                 if (!conjuntoCerradura.contains(estadoDestino)) {
                     pila.push(estadoDestino);
@@ -169,6 +196,7 @@ public class ProyectoFinalEly {
         
     }
 
+    // Método para calcular la cerradura épsilon de un conjunto de estados en el AFND
     private static Set<String> cerraduraEpsilon(Set<String> estados, AFND afnd) {
         
         Set<String> conjuntoCerradura = new HashSet<>();
@@ -181,6 +209,7 @@ public class ProyectoFinalEly {
         
     }
 
+    // Método para calcular el conjunto de estados destino a partir de un conjunto de estados y un símbolo en el AFND
     private static Set<String> mover(Set<String> estados, char simbolo, AFND afnd) {
         
         Set<String> conjuntoDestino = new HashSet<>();
@@ -193,6 +222,7 @@ public class ProyectoFinalEly {
         
     }
 
+    // Método para convertir un conjunto de estados en una cadena de texto
     private static String convertirConjuntoAString(Set<String> conjunto) {
         
         StringBuilder sb = new StringBuilder();
@@ -209,8 +239,8 @@ public class ProyectoFinalEly {
         
     }
 
+    // Método para imprimir la representación del AFD
     private static void imprimirAFD(AFD afd) {
-        
         
         System.out.println("Estados:");
         for (String estado : afd.getEstados()) {  
